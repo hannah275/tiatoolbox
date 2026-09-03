@@ -1,4 +1,4 @@
-"""Test for rust functionality."""
+"""Test for rust functionality when converting utils into rust."""
 
 import json
 import tempfile

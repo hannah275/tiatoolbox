@@ -1,4 +1,3 @@
-# tiatoolbox/rust/utils/misc.pyi
 from collections.abc import Callable
 from types import ModuleType
 from typing import Any

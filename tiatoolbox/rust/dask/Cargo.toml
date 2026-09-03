@@ -1,0 +1,11 @@
+[package]
+name = "dask"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "dask"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { workspace = true, features = ["extension-module"] }

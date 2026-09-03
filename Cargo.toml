@@ -2,6 +2,7 @@
 resolver = "2"
 members = [
     "tiatoolbox/rust/utils/misc",
+    "tiatoolbox/rust/dask"
 ]
 
 [workspace.package]

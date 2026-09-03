@@ -309,3 +309,10 @@ path = "tiatoolbox/rust/utils/misc/Cargo.toml"
 binding = "PyO3"
 #Uncomment below for release
 #debug = false
+
+[[tool.setuptools-rust.ext-modules]]
+target = "tiatoolbox.rust.dask"
+path = "tiatoolbox/rust/dask/Cargo.toml"
+binding = "PyO3"
+#Uncomment below for release
+#debug = false
