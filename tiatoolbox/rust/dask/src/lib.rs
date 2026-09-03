@@ -9,6 +9,45 @@ use ndarray::Array2;
 use pyo3::exceptions::PyValueError;
 use numpy::PyArray2;
 use numpy::PyReadonlyArray2;
+use pyo3::prelude::*;
+use pyo3::exceptions::PyRuntimeError;
+use polars::prelude::*;
+use std::path::PathBuf;
+
+#[pyfunction]
+fn rustdask(path: String) -> PyResult<usize> {
+    // Read CSV
+    let df = CsvReadOptions::default()
+        .with_has_header(true)
+        .try_into_reader_with_file_path(Some(PathBuf::from(path)))
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?
+        .finish()
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+
+    // Get first column by index
+    let first_col = df
+        .select_at_idx(0)
+        .ok_or_else(|| PyRuntimeError::new_err("CSV has no columns"))?;
+
+    // Cast to Int64 in case CSV inference gives us an integer type
+    let first_col = first_col
+        .as_materialized_series()
+        .cast(&DataType::Int64)
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+
+    // first column == 1
+    let mask = first_col
+        .i64()
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?
+        .equal(1);
+
+    let filtered_df = df
+        .filter(&mask)
+        .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+
+    Ok(filtered_df.height())
+}
+
 
 #[pyfunction]
 fn filter_df(x: i32) -> PyResult<f64> {
@@ -94,6 +133,6 @@ fn dask(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(add, m)?)?;
     m.add_function(wrap_pyfunction!(filter_df, m)?)?;
     m.add_function(wrap_pyfunction!(filter_df_given_df, m)?)?;
-
+    m.add_function(wrap_pyfunction!(rustdask, m)?)?;
     Ok(())
 }
